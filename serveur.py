@@ -260,5 +260,4 @@ def demarrer_serveur():
         print("[OK] Serveur fermé.")
 
 
-if __name__ == "__main__":
-    demarrer_serveur()
+demarrer_serveur()
