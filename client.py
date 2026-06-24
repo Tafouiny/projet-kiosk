@@ -1,6 +1,9 @@
 """
-client.py — Client TCP interactif pour le Kiosk
-Usage : python client.py [HOST] [PORT]
+- Kasongo Mashika Samuel Evariste
+- Papa Mbaye Diop
+- Sokhna Sylla
+- Hountondji Geoffroy
+- Mouhamadou Moustapha Ndiaye
 """
 
 import socket

@@ -1,7 +1,9 @@
 """
-auth.py — Gestion de l'authentification et des profils clients
-Fonctions : inscription, connexion, validation token, déconnexion,
-            modification mot de passe, suppression profil
+- Kasongo Mashika Samuel Evariste
+- Papa Mbaye Diop
+- Sokhna Sylla
+- Hountondji Geoffroy
+- Mouhamadou Moustapha Ndiaye
 """
 
 from datetime import datetime

@@ -1,9 +1,9 @@
 """
-serveur.py — Serveur TCP du Kiosk à produits
-- Jusqu'à 20 clients simultanés (threading)
-- Authentification par token à chaque échange
-- Timer automatique de validation commande après 5 minutes
-- Protocole : échange de messages JSON délimités par newline
+- Kasongo Mashika Samuel Evariste
+- Papa Mbaye Diop
+- Sokhna Sylla
+- Hountondji Geoffroy
+- Mouhamadou Moustapha Ndiaye
 """
 
 import socket

@@ -1,6 +1,9 @@
 """
-boutique.py — Catalogue, commandes, annulation
-Fonctions : afficher catalogue, passer commande, annuler commande
+- Kasongo Mashika Samuel Evariste
+- Papa Mbaye Diop
+- Sokhna Sylla
+- Hountondji Geoffroy
+- Mouhamadou Moustapha Ndiaye
 """
 
 from datetime import datetime, timedelta
