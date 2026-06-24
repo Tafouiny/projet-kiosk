@@ -25,6 +25,18 @@ class BaseModel(Model):
         database = db
 
 
+# ── Fonctions utilitaires (sans décorateurs) ─────────────────────────────────
+
+def hacher(mdp: str) -> str:
+    """Retourne le SHA-256 du mot de passe."""
+    return hashlib.sha256(mdp.encode()).hexdigest()
+
+
+def generer_token() -> str:
+    """Génère un token de session aléatoire de 64 caractères hex."""
+    return secrets.token_hex(32)
+
+
 # ── Modèle Client ────────────────────────────────────────────────────────────
 
 class Client(BaseModel):
@@ -42,13 +54,9 @@ class Client(BaseModel):
     class Meta:
         table_name = "clients"
 
-    @staticmethod
-    def hacher(mdp: str) -> str:
-        """Retourne le SHA-256 du mot de passe."""
-        return hashlib.sha256(mdp.encode()).hexdigest()
-
     def verifier_mdp(self, mdp: str) -> bool:
-        return self.mot_de_passe == Client.hacher(mdp)
+        """Vérifie si le mot de passe fourni correspond à celui stocké."""
+        return self.mot_de_passe == hacher(mdp)
 
     def __str__(self):
         return (f"Client({self.identifiant} | "
@@ -108,10 +116,6 @@ class Session(BaseModel):
     class Meta:
         table_name = "sessions"
 
-    @staticmethod
-    def generer_token() -> str:
-        return secrets.token_hex(32)   # 64 chars hex
-
     def __str__(self):
         return f"Session({self.client.identifiant} | actif={self.actif})"
 
@@ -135,8 +139,8 @@ class Commande(BaseModel):
 
     client        = ForeignKeyField(Client, backref="commandes",
                                     on_delete="RESTRICT")
-    montant_total = FloatField(default=0.0)   # avant remise
-    montant_paye  = FloatField(default=0.0)   # après remise
+    montant_total = FloatField(default=0.0)
+    montant_paye  = FloatField(default=0.0)
     statut        = CharField(max_length=20, default=STATUT_ATTENTE)
     cree_le       = DateTimeField(default=datetime.now)
 
@@ -169,19 +173,19 @@ class LigneCommande(BaseModel):
     produit       = ForeignKeyField(Produit, backref="lignes",
                                     on_delete="RESTRICT")
     quantite      = IntegerField()
-    prix_unitaire = FloatField()   # snapshot
+    prix_unitaire = FloatField()
 
     class Meta:
         table_name = "lignes_commande"
 
-    @property
     def sous_total(self) -> float:
+        """Retourne le sous-total de la ligne (quantité × prix unitaire)."""
         return self.quantite * self.prix_unitaire
 
     def __str__(self):
         return (f"{self.produit.nom} x{self.quantite} "
                 f"@ {self.prix_unitaire:.0f} FCFA "
-                f"= {self.sous_total:.0f} FCFA")
+                f"= {self.sous_total():.0f} FCFA")
 
 
 # ── Initialisation DB + données de départ ────────────────────────────────────
@@ -249,7 +253,6 @@ if __name__ == "__main__":
 
     init_db()
 
-    # Affichage du catalogue
     for cat in Categorie.select():
         print(f"\n{'='*45}")
         print(f"  {cat.nom.upper()}")
@@ -257,20 +260,17 @@ if __name__ == "__main__":
         for p in cat.produits:
             print(f"  • {p}")
 
-    # Création client test
     client = Client.create(
         identifiant="diallo01",
         nom="Diallo",
         prenom="Moussa",
-        mot_de_passe=Client.hacher("secret123"),
+        mot_de_passe=hacher("secret123"),
     )
     print(f"\n✅ {client}")
 
-    # Token de session
-    tok = Session.generer_token()
+    tok = generer_token()
     sess = Session.create(client=client, token=tok)
     print(f"🔑 Token : {tok[:20]}…  actif={sess.actif}")
 
-    # Vérification mot de passe
-    print(f"🔐 MDP correct  : {client.verifier_mdp('secret123')}")
-    print(f"🔐 MDP incorrect: {client.verifier_mdp('mauvais')}")
+    print(f"🔐 MDP correct   : {client.verifier_mdp('secret123')}")
+    print(f"🔐 MDP incorrect : {client.verifier_mdp('mauvais')}")

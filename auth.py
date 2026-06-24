@@ -8,7 +8,7 @@
 
 from datetime import datetime
 from peewee import IntegrityError
-from models import db, Client, Session
+from models import db, Client, Session, hacher, generer_token
 
 
 # ── Codes de réponse ─────────────────────────────────────────────────────────
@@ -40,7 +40,7 @@ def inscrire_client(identifiant: str, nom: str,
             identifiant=identifiant.strip(),
             nom=nom.strip(),
             prenom=prenom.strip(),
-            mot_de_passe=Client.hacher(mot_de_passe),
+            mot_de_passe=hacher(mot_de_passe),
             bourse=10_000.0
         )
         return {
@@ -85,7 +85,7 @@ def connecter_client(identifiant: str, mot_de_passe: str) -> dict:
         }
 
     # Créer une nouvelle session
-    token = Session.generer_token()
+    token = generer_token()
     Session.create(client=client, token=token, cree_le=datetime.now())
 
     return {
@@ -187,7 +187,7 @@ def modifier_mot_de_passe(token: str,
                 "message": "ERREUR: Le nouveau mot de passe est trop court (min 4 caractères)."}
 
     Client.update(
-        mot_de_passe=Client.hacher(nouveau_mdp)
+        mot_de_passe=hacher(nouveau_mdp)
     ).where(Client.id == client.id).execute()
 
     return {"statut": OK, "message": "Mot de passe modifié avec succès."}
